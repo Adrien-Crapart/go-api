@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api:
+  platform: linux/x86_64
+  container-name: go-api
+  build:
+    context: .
+    dockerfile: Dockerfile
+  ports:
+    - "8080:8080"
+  volumes:
+    - .:/app
+  env_files:
+    - .env
+  networks:
+    - services-cluster
+
+networks:
+  services-cluster:
+    external:
+      name: services-cluster
