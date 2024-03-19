@@ -1,31 +1,45 @@
 package config
 
 import (
+	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
+var AppConfig *Config
+
 type Config struct {
-    DBUsername string
-    DBPassword string
-    DBHost     string
-    DBPort     string
-    DBName     string
+    Port     string
+    DBConfig DBConfig
 }
 
-var AppConfig Config
+type DBConfig struct {
+    Host     string
+    Port     string
+    User     string
+    Password string
+    DBName   string
+}
 
-func LoadConfig() {
-    // Load configuration from environment variables or config files
-    AppConfig = Config{
-        DBUsername: os.Getenv("DB_USERNAME"),
-        DBPassword: os.Getenv("DB_PASSWORD"),
-        DBHost:     os.Getenv("DB_HOST"),
-        DBPort:     os.Getenv("DB_PORT"),
-        DBName:     os.Getenv("DB_NAME"),
+func LoadEnv() {
+    err := godotenv.Load()
+    if err != nil {
+        log.Fatal("Error loading .env file")
     }
 }
 
-func GetDBConnectionString() string {
-    // Construct and return the database connection string
-    return "postgres://" + AppConfig.DBUsername + ":" + AppConfig.DBPassword + "@" + AppConfig.DBHost + ":" + AppConfig.DBPort + "/" + AppConfig.DBName + "?sslmode=disable"
+func InitConfig() {
+    LoadEnv()
+
+    AppConfig = &Config{
+        Port: os.Getenv("PORT"),
+        DBConfig: DBConfig{
+            Host:     os.Getenv("DB_HOST"),
+            Port:     os.Getenv("DB_PORT"),
+            User:     os.Getenv("DB_USER"),
+            Password: os.Getenv("DB_PASSWORD"),
+            DBName:   os.Getenv("DB_NAME"),
+        },
+    }
 }
